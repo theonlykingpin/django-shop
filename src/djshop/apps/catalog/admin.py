@@ -6,12 +6,8 @@ from treebeard.forms import movenodeform_factory
 from djshop.apps.catalog.models import Category, ProductClass, Option, ProductAttribute
 
 
-# Register your models here.
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(Category)
-
-
-admin.site.register(Option)
 
 
 class ProductAttributeInline(admin.StackedInline):
@@ -49,6 +45,10 @@ class ProductClassAdmin(admin.ModelAdmin):
         queryset.update(track_stock=True)
 
 
+@admin.register(Option)
+class OptionAdmin(admin.ModelAdmin):
+    pass
 
-
-admin.site.register(Category, CategoryAdmin)
+@admin.register(category)
+class CategoryAdminClass(categoryAdmin):
+    pass
