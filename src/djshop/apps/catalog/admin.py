@@ -3,16 +3,25 @@ from django.db.models import Count
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
-from djshop.apps.catalog.models import Category, ProductClass, Option, ProductAttribute
+from djshop.apps.catalog.models import Category, ProductClass, Option, ProductAttribute, ProductRecommendation
 
 
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(Category)
 
 
+admin.site.register(Option)
+
+
 class ProductAttributeInline(admin.StackedInline):
     model = ProductAttribute
     extra = 2
+
+
+class ProductRecommendationInline(admin.StackedInline):
+    model = ProductRecommendation
+    extra = 2
+    fk_name = 'primary'
 
 
 class AttributeCountFilter(admin.SimpleListFilter):
@@ -31,13 +40,15 @@ class AttributeCountFilter(admin.SimpleListFilter):
         if self.value() == "lower_5":
             return queryset.annotate(attr_count=Count('attributes')).filter(attr_count__lte=5)
 
+
 @admin.register(ProductClass)
 class ProductClassAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'require_shipping', 'track_stock', 'attribute_count')
-    list_filter = ('require_shipping','track_stock' , AttributeCountFilter)
-    inlines = [ProductAttributeInline]
+    list_filter = ('require_shipping', 'track_stock', AttributeCountFilter)
+    inlines = [ProductAttributeInline, ProductRecommendationInline]
     actions = ['enable_track_stock']
-    prepopulated_fields = { "slug":("title",)}
+    prepopulated_fields = {"slug": ("title",)}
+
     def attribute_count(self, obj):
         return obj.attributes.count()
 
@@ -45,10 +56,4 @@ class ProductClassAdmin(admin.ModelAdmin):
         queryset.update(track_stock=True)
 
 
-@admin.register(Option)
-class OptionAdmin(admin.ModelAdmin):
-    pass
-
-@admin.register(category)
-class CategoryAdminClass(categoryAdmin):
-    pass
+admin.site.register(Category, CategoryAdmin)
