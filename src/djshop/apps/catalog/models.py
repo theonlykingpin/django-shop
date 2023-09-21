@@ -5,6 +5,7 @@ from djshop.apps.catalog.managers import CategoryQuerySet
 from djshop.libs.db.fields import UpperCaseCharField
 
 
+# Create your models here.
 class Category(MP_Node):
     title = models.CharField(max_length=255, db_index=True)
     description = models.CharField(max_length=2048, null=True, blank=True)
@@ -48,8 +49,10 @@ class ProductClass(models.Model):
     title = models.CharField(max_length=255, db_index=True)
     description = models.CharField(max_length=2048, null=True, blank=True)
     slug = models.SlugField(unique=True, allow_unicode=True)
+
     track_stock = models.BooleanField(default=True)
     require_shipping = models.BooleanField(default=True)
+
     options = models.ManyToManyField('Option', blank=True)
 
     @property
@@ -65,7 +68,6 @@ class ProductClass(models.Model):
 
 
 class ProductAttribute(models.Model):
-
     class AttributeTypeChoice(models.TextChoices):
         text = 'text'
         integer = 'integer'
@@ -88,7 +90,6 @@ class ProductAttribute(models.Model):
 
 
 class Option(models.Model):
-
     class OptionTypeChoice(models.TextChoices):
         text = 'text'
         integer = 'integer'
@@ -110,7 +111,6 @@ class Option(models.Model):
 
 
 class Product(models.Model):
-
     class ProductTypeChoice(models.TextChoices):
         standalone = 'standalone'
         parent = 'parent'
@@ -123,11 +123,14 @@ class Product(models.Model):
     is_public = models.BooleanField(default=True)
     meta_title = models.CharField(max_length=128, null=True, blank=True)
     meta_description = models.TextField(null=True, blank=True)
+
     slug = models.SlugField(unique=True, allow_unicode=True)
+
     product_class = models.ForeignKey(ProductClass, on_delete=models.PROTECT, null=True, blank=True,
                                       related_name='products')
     attributes = models.ManyToManyField(ProductAttribute, through='ProductAttributeValue')
     recommended_products = models.ManyToManyField('catalog.Product',through='ProductRecommendation', blank=True)
+
 
     class Meta:
         verbose_name = "Product"
@@ -137,6 +140,7 @@ class Product(models.Model):
 class ProductAttributeValue(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     attribute = models.ForeignKey(ProductAttribute, on_delete=models.CASCADE)
+
     value_text = models.TextField(null=True, blank=True)
     value_integer = models.IntegerField(null=True, blank=True)
     value_float = models.FloatField(null=True, blank=True)
@@ -156,7 +160,5 @@ class ProductRecommendation(models.Model):
     rank = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
-        verbose_name = "Product Recommendation"
-        verbose_name_plural = "Product Recommendations"
         unique_together = ('primary', 'recommendation')
         ordering = ('primary','-rank')
