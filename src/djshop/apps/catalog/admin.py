@@ -6,6 +6,7 @@ from treebeard.forms import movenodeform_factory
 from djshop.apps.catalog.models import Category, ProductClass, Option, ProductAttribute, ProductRecommendation
 
 
+# Register your models here.
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(Category)
 
@@ -45,7 +46,7 @@ class AttributeCountFilter(admin.SimpleListFilter):
 class ProductClassAdmin(admin.ModelAdmin):
     list_display = ('title', 'slug', 'require_shipping', 'track_stock', 'attribute_count')
     list_filter = ('require_shipping', 'track_stock', AttributeCountFilter)
-    inlines = [ProductAttributeInline, ProductRecommendationInline]
+    inlines = [ProductAttributeInline]
     actions = ['enable_track_stock']
     prepopulated_fields = {"slug": ("title",)}
 
